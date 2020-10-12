@@ -23,7 +23,8 @@
             "restParams": true,
             "spread": true,
             "superInFunctions": true,
-            "templateStrings": true
+            "templateStrings": true,
+            "sourceType": "module"
         }
     },
     "extends": [

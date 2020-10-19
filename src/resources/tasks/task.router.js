@@ -1,3 +1,5 @@
+const { NOT_FOUND } = require('http-status-codes');
+const { ValidationError } = require('../../middleware/errors');
 const router = require('express').Router();
 const tasksService = require('./task.service');
 
@@ -11,7 +13,9 @@ router
     if (task) {
       res.status(200).json(task);
     } else {
-      res.status(404).json({
+      throw new ValidationError({
+        status: NOT_FOUND,
+        type: 'Validation error',
         message: 'Task not found'
       });
     }
@@ -25,7 +29,9 @@ router
     if (task) {
       res.status(200).json(task);
     } else {
-      res.status(404).json({
+      throw new ValidationError({
+        status: NOT_FOUND,
+        type: 'Validation error',
         message: 'Task not found'
       });
     }
@@ -35,7 +41,9 @@ router
     if (task) {
       res.sendStatus(204);
     } else {
-      res.status(404).json({
+      throw new ValidationError({
+        status: NOT_FOUND,
+        type: 'Validation error',
         message: 'User not found'
       });
     }

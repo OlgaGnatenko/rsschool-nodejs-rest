@@ -1,3 +1,6 @@
+const { NOT_FOUND } = require('http-status-codes');
+const { ValidationError } = require('../../middleware/errors');
+
 const router = require('express').Router();
 const boardsService = require('./board.service');
 const taskRouter = require('../tasks/task.router');
@@ -16,14 +19,20 @@ router
     const boards = await boardsService.getAll();
     res.status(200).json(boards);
   })
-  .get('/:boardId', async (req, res) => {
-    const board = await boardsService.getById(req.params.boardId);
-    if (board) {
-      res.status(200).json(board);
-    } else {
-      res.status(404).json({
-        message: 'Board not found'
-      });
+  .get('/:boardId', async (req, res, next) => {
+    try {
+      const board = await boardsService.getById(req.params.boardId);
+      if (board) {
+        res.status(200).json(board);
+      } else {
+        throw new ValidationError({
+          status: NOT_FOUND,
+          type: 'Validation error',
+          message: 'Board not found'
+        });
+      }
+    } catch (err) {
+      return next(err);
     }
   })
   .post('/', async (req, res) => {
@@ -35,7 +44,9 @@ router
     if (board) {
       res.status(200).json(board);
     } else {
-      res.status(404).json({
+      throw new ValidationError({
+        status: NOT_FOUND,
+        type: 'Validation error',
         message: 'Board not found'
       });
     }
@@ -45,7 +56,9 @@ router
     if (board) {
       res.sendStatus(204);
     } else {
-      res.status(404).json({
+      throw new ValidationError({
+        status: NOT_FOUND,
+        type: 'Validation error',
         message: 'Board not found'
       });
     }

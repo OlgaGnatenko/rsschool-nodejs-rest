@@ -1,3 +1,5 @@
+const { NOT_FOUND } = require('http-status-codes');
+const { ValidationError } = require('../../middleware/errors');
 const router = require('express').Router();
 const User = require('./user.model');
 const usersService = require('./user.service');
@@ -13,7 +15,9 @@ router
     if (user) {
       res.status(200).json(User.toResponse(user));
     } else {
-      res.status(404).json({
+      throw new ValidationError({
+        status: NOT_FOUND,
+        type: 'Validation error',
         message: 'User not found'
       });
     }
@@ -27,7 +31,9 @@ router
     if (user) {
       res.status(200).json(User.toResponse(user));
     } else {
-      res.status(404).json({
+      throw new ValidationError({
+        status: NOT_FOUND,
+        type: 'Validation error',
         message: 'User not found'
       });
     }
@@ -37,7 +43,9 @@ router
     if (user) {
       res.sendStatus(204);
     } else {
-      res.status(404).json({
+      throw new ValidationError({
+        status: NOT_FOUND,
+        type: 'Validation error',
         message: 'User not found'
       });
     }

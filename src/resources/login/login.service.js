@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const { ValidationError } = require('../../middleware/errors');
 const { StatusCodes } = require('http-status-codes');
 const UserRepository = require('../users/user.repository');
-const { JWT_SECRET_KEY } = process.env;
+const { JWT_SECRET_KEY, PASSWORD_SECRET_KEY } = process.env;
 
 const handleLogin = async user => {
   const { login, password } = user;
@@ -15,7 +15,7 @@ const handleLogin = async user => {
     });
   }
 
-  const dbUser = UserRepository.getByProp('login', login);
+  const dbUser = await UserRepository.getByProp('login', login);
   if (!dbUser) {
     throw new ValidationError({
       type: 'Validation error',
@@ -25,8 +25,9 @@ const handleLogin = async user => {
   }
 
   const { hash, _id } = dbUser;
-  const isCorrectPassword = await bcrypt.compare(password, hash);
-  if (!isCorrectPassword) {
+  const newHash = await bcrypt.hash(password, PASSWORD_SECRET_KEY);
+
+  if (hash !== newHash) {
     throw new ValidationError({
       type: 'Validation error',
       status: StatusCodes.UNAUTHORIZED,

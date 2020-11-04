@@ -6,12 +6,16 @@ const jwt = require('jsonwebtoken');
 const authorize = publicRoutes => {
   return (req, res, next) => {
     const { baseUrl, path } = req;
+    const hashedRoutes = publicRoutes
+      ? publicRoutes.map(item => `${item}/`)
+      : [];
     const currentRoute = `${baseUrl}${path}`;
-    if (
+    const isPublicRoute =
       publicRoutes &&
       publicRoutes.length &&
-      publicRoutes.includes(currentRoute)
-    ) {
+      (publicRoutes.includes(currentRoute) ||
+        hashedRoutes.includes(currentRoute));
+    if (isPublicRoute) {
       return next();
     }
 

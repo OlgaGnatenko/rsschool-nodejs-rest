@@ -10,7 +10,7 @@ const loginRouter = require('./resources/login/login.router');
 const authorize = require('./middleware/authorize');
 const logger = require('./middleware/logger');
 const { errorHandler } = require('./middleware/errors');
-const { INTERNAL_SERVER_ERROR } = require('http-status-codes');
+const { StatusCodes, ReasonPhrases } = require('http-status-codes');
 
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
@@ -37,7 +37,7 @@ app.use('/login', loginRouter);
 process.on('uncaughtException', err => {
   logger.logError({
     message: err.message || 'Uncaught exception',
-    status: err.status || INTERNAL_SERVER_ERROR,
+    status: err.status || StatusCodes.INTERNAL_SERVER_ERROR,
     type: 'Uncaught exception'
   });
   // eslint-disable-next-line no-process-exit
@@ -46,10 +46,14 @@ process.on('uncaughtException', err => {
 
 process.on('unhandledRejection', reason => {
   logger.logError({
-    status: INTERNAL_SERVER_ERROR,
+    status: StatusCodes.INTERNAL_SERVER_ERROR,
     type: 'Unhandled rejection',
     message: JSON.stringify(reason) || 'Unhandled rejection'
   });
+});
+
+app.get('*', (_req, res) => {
+  res.status(StatusCodes.NOT_FOUND).send(ReasonPhrases.NOT_FOUND);
 });
 
 app.use(errorHandler);

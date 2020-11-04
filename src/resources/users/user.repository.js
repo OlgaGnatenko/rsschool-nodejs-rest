@@ -25,4 +25,17 @@ const deleteUser = async id => {
   return (await User.deleteOne({ _id: id })).deletedCount;
 };
 
-module.exports = { getAll, getById, createUser, updateUser, deleteUser };
+const getByProp = async (propKey, propValue) => {
+  return User.findOne({
+    [propKey]: propValue
+  });
+};
+
+module.exports = {
+  getAll,
+  getById,
+  createUser,
+  updateUser,
+  deleteUser,
+  getByProp
+};

@@ -6,15 +6,19 @@ require('express-async-errors');
 
 const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/boards/board.router');
+const loginRouter = require('./resources/login/login.router');
+const authorize = require('./middleware/authorize');
 const logger = require('./middleware/logger');
 const { errorHandler } = require('./middleware/errors');
 const { INTERNAL_SERVER_ERROR } = require('http-status-codes');
 
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
+const publicRoutes = ['/login', '/doc', '/'];
 
 app.use(express.json());
 app.use(logger.logRequest);
+app.use(authorize(publicRoutes));
 
 app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
@@ -28,6 +32,7 @@ app.use('/', (req, res, next) => {
 
 app.use('/users', userRouter);
 app.use('/boards', boardRouter);
+app.use('/login', loginRouter);
 
 process.on('uncaughtException', err => {
   logger.logError({
